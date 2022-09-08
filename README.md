@@ -1,0 +1,2 @@
+# djecom
+django-ecommerce site
