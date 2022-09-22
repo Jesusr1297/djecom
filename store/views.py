@@ -1,3 +1,6 @@
+import json
+
+from django.http import JsonResponse
 from django.shortcuts import render
 from . import models
 
@@ -31,3 +34,13 @@ def checkout(request):
         order = {'get_cart_total': 0, 'get_cart_items': 0}
     context = {'items': items, 'order': order}
     return render(request=request, template_name='store/checkout.html', context=context)
+
+
+def update_item(request):
+    data = json.loads(request.body)
+    product_id = data['productId']
+    action = data['action']
+
+    print('Action: ', action)
+    print('productId', product_id)
+    return JsonResponse('Item was added', safe=False)
