@@ -31,6 +31,7 @@ def cart(request):
     else:
         items = []
         order = {'get_cart_total': 0, 'get_cart_items': 0, 'shipping': False}
+        cart_items = 0
     context = {'items': items, 'order': order, 'cartItems': cart_items}
     return render(request=request, template_name='store/cart.html', context=context)
 
@@ -44,6 +45,7 @@ def checkout(request):
     else:
         items = []
         order = {'get_cart_total': 0, 'get_cart_items': 0, 'shipping': False}
+        cart_items = 0
     context = {'items': items, 'order': order, 'cartItems': cart_items}
     return render(request=request, template_name='store/checkout.html', context=context)
 
@@ -70,3 +72,8 @@ def update_item(request):
     if order_item.quantity <= 0:
         order_item.delete()
     return JsonResponse('Item was added', safe=False)
+
+
+def process_order(request):
+    print('data', request.body)
+    return JsonResponse('Payment completed', safe=False)
