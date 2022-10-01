@@ -1,7 +1,9 @@
 import json
-
+import datetime
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
+
 from . import models
 
 
@@ -74,6 +76,31 @@ def update_item(request):
     return JsonResponse('Item was added', safe=False)
 
 
+@csrf_exempt
 def process_order(request):
-    print('data', request.body)
+    transaction_id = datetime.datetime.now().timestamp()
+    data = json.loads(request.body)
+    if request.user.is_authenticated:
+        customer = request.user.customer
+        order, created = models.Order.objects.get_or_create(customer=customer, complete=False)
+        total = float(data['form']['total'])
+        order.transaction_id = transaction_id
+
+        if total == order.get_cart_total:
+            order.complete = True
+        order.save()
+
+        if order.shipping:
+            models.ShippingAddress.objects.create(
+                customer=customer,
+                order=order,
+                address=data['shipping']['address'],
+                state=data['shipping']['state'],
+                city=data['shipping']['city'],
+                zip_code=data['shipping']['zipcode'],
+
+            )
+
+    else:
+        print('user not logged in')
     return JsonResponse('Payment completed', safe=False)
