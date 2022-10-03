@@ -41,6 +41,25 @@ def cart(request):
 
         for i in cart:
             cart_items += cart[i]['quantity']
+            product = models.Product.objects.get(id=i)
+            total = product.price * cart[i]['quantity']
+
+            order['get_cart_total'] += total
+            order['get_cart_items'] += cart[i]['quantity']
+
+            item = {
+                'product': {
+                    'id': product.id,
+                    'name': product.name,
+                    'price': product.price,
+                    'image_url': product.image_url
+                },
+                'quantity': cart[i]['quantity'],
+                'get_total': total
+            }
+
+            items.append(item)
+
     context = {'items': items, 'order': order, 'cartItems': cart_items}
     return render(request=request, template_name='store/cart.html', context=context)
 
